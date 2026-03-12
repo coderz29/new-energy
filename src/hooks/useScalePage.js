@@ -31,11 +31,15 @@ export default function useScalePage(options) {
     let scaleRatio = currentX / targetX;
     let currentRatio = currentX / currentY;
 
+    const bodyStyle = document.body.style;
+
     if (currentRatio > targetRatio) {
       scaleRatio = currentY / targetY;
-      document.body.style = `transform:scale(${scaleRatio}) translateX(-50%); left:50%;`;
+      bodyStyle.transform = `scale(${scaleRatio}) translateX(-50%)`;
+      bodyStyle.left = "50%";
     } else {
-      document.body.style = `transform:scale(${scaleRatio})`;
+      bodyStyle.transform = `scale(${scaleRatio})`;
+      bodyStyle.left = "0";
     }
   }
 }

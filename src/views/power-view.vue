@@ -1,6 +1,5 @@
 <script setup>
-import { ref } from "vue";
-import { getPowerScreenData } from "@/services/index";
+import usePowerScreenData from "@/hooks/usePowerScreenData";
 import lineEcharts from "../components/line-echarts.vue";
 import pieEcharts from "../components/pie-echarts.vue";
 import barEcharts from "../components/bar-echarts.vue";
@@ -9,37 +8,36 @@ import centerSvg from '../components/center-svg.vue'
 import bottomPenal from "../components/bottom-penal.vue";
 import rightTopPanel from "../components/right-top-panel.vue";
 
-import {
-  chargingPieData,
-  processMonitoringData,
-  chargingStatisticsData,
-  exceptionMonitoringData,
-  dataAnalysisData,
-  chargingTop4Data
-} from "./config/home-data";
-
-const chargingPie = ref(chargingPieData);
-const processMonitoring = ref(processMonitoringData);
-const chargingStatistics = ref(chargingStatisticsData);
-const exceptionMonitoring = ref(exceptionMonitoringData);
-const dataAnalysis = ref(dataAnalysisData);
-const chargingTop4 = ref(chargingTop4Data)
-const percentage = ref(0)
-
-getPowerScreenData().then((res) => {
-  chargingPie.value = res.data.chargingPile.data;
-  processMonitoring.value = res.data.processMonitoring.data;
-  chargingStatistics.value = res.data.chargingStatistics.data;
-  exceptionMonitoring.value = res.data.exceptionMonitoring.data;
-  dataAnalysis.value = res.data.dataAnalysis.data;
-  chargingTop4.value = res.data.chargingTop4.data;
-  percentage.value = res.data.chargingTop4.totalPercentage
-});
+const {
+  chargingPie,
+  processMonitoring,
+  chargingStatistics,
+  exceptionMonitoring,
+  dataAnalysis,
+  chargingTop4,
+  percentage,
+  loading,
+  error,
+  reload
+} = usePowerScreenData();
 </script>
 
 <template>
   <main class="screen-bg">
     <div class="header"></div>
+
+    <div v-if="loading" class="loading-mask">
+      <div class="loading-title">º”‘ÿ÷–...</div>
+      <div class="loading-skeleton">
+        <div class="skeleton-block w-lg h-md"></div>
+        <div class="skeleton-block w-md h-sm"></div>
+        <div class="skeleton-block w-lg h-sm"></div>
+      </div>
+    </div>
+    <div v-else-if="error" class="status error">
+      <span>{{ error }}</span>
+      <button class="retry" type="button" @click="reload">ÈáçËØï</button>
+    </div>
 
     <div class="left-top">
       <pie-echarts :echart-datas="chargingPie" />
@@ -143,4 +141,74 @@ getPowerScreenData().then((res) => {
   height: 209px;
   background: url(@/assets/images/bg_bottom.svg) no-repeat;
 }
+.loading-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: rgba(2, 7, 14, 0.55);
+  backdrop-filter: blur(1px);
+}
+.loading-title {
+  font-size: 14px;
+  color: #e6f1ff;
+  letter-spacing: 1px;
+}
+.loading-skeleton {
+  display: grid;
+  gap: 12px;
+}
+.skeleton-block {
+  border-radius: 6px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.08) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+}
+.w-lg { width: 420px; }
+.w-md { width: 300px; }
+.w-sm { width: 180px; }
+.h-lg { height: 20px; }
+.h-md { height: 16px; }
+.h-sm { height: 12px; }
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.status {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #e6f1ff;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+.status.error {
+  color: #ffd6d6;
+  border-color: rgba(255, 90, 90, 0.35);
+}
+.retry {
+  padding: 2px 6px;
+  font-size: 12px;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.retry:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
 </style>
+
+

@@ -163,3 +163,34 @@ export const chargingTop4Data = [
   },
 ];
 
+
+export const createChargingPieData = () =>
+  chargingPieData.map((item) => ({ ...item }));
+
+export const createProcessMonitoringData = () =>
+  processMonitoringData.map((item) => ({ ...item, data: [...item.data] }));
+
+export const createChargingStatisticsData = () =>
+  chargingStatisticsData.map((item) => ({ ...item }));
+
+export const createExceptionMonitoringData = () =>
+  exceptionMonitoringData.map((item) => ({ ...item }));
+
+export const createDataAnalysisData = () =>
+  dataAnalysisData.map((item) => ({ ...item }));
+
+export const createChargingTop4Data = () =>
+  chargingTop4Data.map((item) => ({ ...item }));
+
+export function createPowerScreenDefaults() {
+  return {
+    chargingPie: createChargingPieData(),
+    processMonitoring: createProcessMonitoringData(),
+    chargingStatistics: createChargingStatisticsData(),
+    exceptionMonitoring: createExceptionMonitoringData(),
+    dataAnalysis: createDataAnalysisData(),
+    chargingTop4: createChargingTop4Data(),
+    percentage: 0
+  };
+}
+
